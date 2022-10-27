@@ -1,11 +1,11 @@
 from cProfile import label
 import numpy as np
 import matplotlib.pyplot as plt
-file_name = "test.txt"
+file_name = "text01.txt"
 save_name = "text.png"
-read_path = "D:/" + file_name
+read_path = "C:/Users/Juliazhou/Desktop/differential-flatness-flight/test01.txt"
 
-data = np.loadtxt(read_path, delimiter=',', dtype='float32', skiprows=1)
+data = np.loadtxt(read_path, delimiter=',', dtype='float32', skiprows=1000)
 fig, ax = plt.subplots(4, 3, figsize=(14, 10))
 
 ax[0][0].plot(data[:, 0], 'r-')  # 7  8  9     13 14 15   19 20 21
@@ -42,7 +42,7 @@ ax[3, 0].set_title("body_rate x")
 ax[3, 1].set_title("body_rate y")
 ax[3, 2].set_title("body_rate z")
 
-save_path = "D:/" + save_name
+save_path = "C:/Users/Juliazhou/Desktop/differential-flatness-flight/text.png"
 plt.savefig(save_path, dpi=300)
 plt.show()
 '''
