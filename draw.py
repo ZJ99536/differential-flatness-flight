@@ -5,7 +5,8 @@ file_name = "text01.txt"
 save_name = "text.png"
 read_path = "C:/Users/Juliazhou/Desktop/differential-flatness-flight/test01.txt"
 
-data = np.loadtxt(read_path, delimiter=',', dtype='float32', skiprows=1000)
+data = np.loadtxt(read_path, delimiter=',', dtype='float32', skiprows=1)
+print(data)
 fig, ax = plt.subplots(4, 3, figsize=(14, 10))
 
 ax[0][0].plot(data[:, 0], 'r-')  # 7  8  9     13 14 15   19 20 21
