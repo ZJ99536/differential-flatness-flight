@@ -71,6 +71,7 @@ class Controller:
         self.ki_x = 0
         self.ki_y = 0
         self.ki_z = 0.01
+        self.ki_z_fb = 0.01
 
         self.kd_x = 0
         self.kd_y = 0
@@ -79,6 +80,7 @@ class Controller:
         self.ki_vx = 0
         self.ki_vy = 0
         self.ki_vz = 0.02
+        self.ki_vz_fb = 0.02
 
         self.kd_vx = 0
         self.kd_vy = 0
@@ -195,11 +197,11 @@ class Controller:
     def position_control_fb(self):
         position_cmd = np.array([self.position_setpoint.pose.position.x,self.position_setpoint.pose.position.y,self.position_setpoint.pose.position.z])
         pos_err = position_cmd - self.current_position
+        self.pos_err_sum += pos_err * 1.0/self.loop_freq
 
         self.velocity_setpoint.twist.linear.x = self.kp_x * pos_err[0]
         self.velocity_setpoint.twist.linear.y = self.kp_y * pos_err[1]
-        self.velocity_setpoint.twist.linear.z = self.kp_z * pos_err[2]
-
+        self.velocity_setpoint.twist.linear.z = self.kp_z * pos_err[2] + self.ki_z_fb * self.pos_err_sum[2]
         self.position_setpoint.header.stamp = rospy.Time.now() 
         self.position_setpoint.header.frame_id = 'odom'
         self.velocity_setpoint.header.stamp = rospy.Time.now()  
@@ -216,7 +218,7 @@ class Controller:
         R_E_B = np.array([[cos(psi),sin(psi),0],[-sin(psi),cos(psi),0],[0,0,1]])
         vel_err = R_E_B@vel_err
 
-        self.vel_err_sum += vel_err * 1.0/self.loop_freq
+        self.vel_err_sum += vel_err * 1.0/self.loop_freq + self.ki_vz_fb * self.vel_err_sum[2]
         
         self.thrust_cmd = 0.27 + self.kp_vz * vel_err[2]
         if self.thrust_cmd >= 1:
@@ -271,11 +273,13 @@ class Controller:
         ades = aref + self.g*np.array([0,0,1]) + K_pos @ pos_err + K_vel @ vel_err
                               
         acc_des = ades
-        acc_des[0] += self.ki_vx * self.vel_err_sum[0] + self.kd_vx * (vel_err[0] - self.vel_err_last_step[0])*self.loop_freq
-        acc_des[0] += self.ki_x * self.pos_err_sum[0] + self.kd_x * (pos_err[0] - self.pos_err_last_step[0])*self.loop_freq
-        acc_des[1] += self.ki_y * self.pos_err_sum[1] + self.kd_y * (pos_err[1] - self.pos_err_last_step[1])*self.loop_freq
-        acc_des[2] += self.ki_vz * self.vel_err_sum[2] + self.kd_vz * (vel_err[2] - self.vel_err_last_step[2])*self.loop_freq
-        acc_des[2] += self.ki_z * self.pos_err_sum[2] + self.kd_z * (pos_err[2] - self.pos_err_last_step[2])*self.loop_freq
+        # acc_des[0] += self.ki_vx * self.vel_err_sum[0] + self.kd_vx * (vel_err[0] - self.vel_err_last_step[0])*self.loop_freq
+        # acc_des[0] += self.ki_x * self.pos_err_sum[0] + self.kd_x * (pos_err[0] - self.pos_err_last_step[0])*self.loop_freq
+        # acc_des[1] += self.ki_y * self.pos_err_sum[1] + self.kd_y * (pos_err[1] - self.pos_err_last_step[1])*self.loop_freq
+        # acc_des[2] += self.ki_vz * self.vel_err_sum[2] + self.kd_vz * (vel_err[2] - self.vel_err_last_step[2])*self.loop_freq
+        # acc_des[2] += self.ki_z * self.pos_err_sum[2] + self.kd_z * (pos_err[2] - self.pos_err_last_step[2])*self.loop_freq
+        acc_des[2] += self.ki_vz * self.vel_err_sum[2]
+        acc_des[2] += self.ki_z * self.pos_err_sum[2]
         z_b_des = np.array(acc_des / np.linalg.norm(acc_des))
         y_c = np.array([-sin(psi),cos(psi),0])
         x_b_des = np.cross(y_c,z_b_des) / np.linalg.norm(np.cross(y_c,z_b_des))
