@@ -60,9 +60,9 @@ class Controller:
         self.thrust_cmd = 0.0
 
 
-        self.kp_x = 0.3
-        self.kp_y = 0.3
-        self.kp_z = 0.3
+        self.kp_x = 0.35
+        self.kp_y = 0.35
+        self.kp_z = 0.2
 
         self.kp_vx = 0.3
         self.kp_vy = -0.3
@@ -71,6 +71,8 @@ class Controller:
         self.ki_x = 0
         self.ki_y = 0
         self.ki_z = 0.01
+        self.ki_x_fb = 0
+        self.ki_y_fb = 0
         self.ki_z_fb = 0.01
 
         self.kd_x = 0
@@ -188,7 +190,7 @@ class Controller:
         self.hp = np.array([self.position_setpoint.pose.position.x, self.position_setpoint.pose.position.y, self.position_setpoint.pose.position.z])
         dis = self.current_position - self.hp
 
-        if np.linalg.norm(dis) < 0.05:
+        if np.linalg.norm(dis) < 0.1:
             self.status = 'Planning'
         else:
             self.status = 'Hover'
@@ -198,6 +200,11 @@ class Controller:
         position_cmd = np.array([self.position_setpoint.pose.position.x,self.position_setpoint.pose.position.y,self.position_setpoint.pose.position.z])
         pos_err = position_cmd - self.current_position
         self.pos_err_sum += pos_err * 1.0/self.loop_freq
+        
+        if self.state.mode == "OFFBOARD":
+            self.pos_err_sum += pos_err * 1.0/self.loop_freq
+        else:
+            self.pos_err_sum = np.zeros(3)
 
         self.velocity_setpoint.twist.linear.x = self.kp_x * pos_err[0]
         self.velocity_setpoint.twist.linear.y = self.kp_y * pos_err[1]
@@ -218,9 +225,15 @@ class Controller:
         R_E_B = np.array([[cos(psi),sin(psi),0],[-sin(psi),cos(psi),0],[0,0,1]])
         vel_err = R_E_B@vel_err
 
-        self.vel_err_sum += vel_err * 1.0/self.loop_freq + self.ki_vz_fb * self.vel_err_sum[2]
+        if self.state.mode == "OFFBOARD":
+            self.vel_err_sum += vel_err * 1.0/self.loop_freq
+        else:
+            self.vel_err_sum = np.zeros(3)
         
-        self.thrust_cmd = 0.27 + self.kp_vz * vel_err[2]
+        print("vel_error_sum")
+        print(self.vel_err_sum)
+        
+        self.thrust_cmd = 0.27 + self.kp_vz * vel_err[2] + self.ki_vz_fb * self.vel_err_sum[2]
         if self.thrust_cmd >= 1:
             self.thrust_cmd = 0.99
         elif self.thrust_cmd <= 0:
@@ -504,12 +517,13 @@ def main():
 
     add_thread = threading.Thread(target = thread_job)
     add_thread.start()
-    print("enter main!!!!!!!!!!!!!!!!!")
+    # print("enter main!!!!!!!!!!!!!!!!!")
     # sp_pub = rospy.Publisher("mavros/setpoint_position/local", PoseStamped, queue_size = 1)
     cnt.plan([0,0],[0,0.2],[1,1])
-    print("enter loop???????????????")
+    # print("enter loop???????????????")
+    flag = 1
     # ROS main loop
-    while not rospy.is_shutdown():
+    while not rospy.is_shutdown():      
         cnt.current_time.data = time()-cnt.time_init
         if cnt.status == 'Hover':
             print("enter hover!!!!!!!!!!")
@@ -520,12 +534,19 @@ def main():
             cnt.send_att()
         else:
             print("enter planning!!!!!!!!!!!!!!!")
+            '''
+            if flag == 1:
+                cnt.pos_err_sum = np.zeros(3)
+                cnt.vel_err_sum = np.zeros(3)
+                flag = 0
+            '''
             cnt.current_t = time()-cnt.start_t
             cnt.current_time.data = cnt.current_t
             cnt.planner()
             cnt.position_control()
             cnt.velocity_control()
         # cnt.target_sp.header.stamp = rospy.Time.now()
+            cnt.send_att()
         # sp_pub.publish(cnt.target_sp)
         # cnt.plot_states()
         # plt.show()
