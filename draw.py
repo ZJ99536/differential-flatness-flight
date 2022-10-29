@@ -1,33 +1,38 @@
 from cProfile import label
 import numpy as np
 import matplotlib.pyplot as plt
-file_name = "text01.txt"
-save_name = "text.png"
-read_path = "C:/Users/Juliazhou/Desktop/differential-flatness-flight/test01.txt"
+file_name = "test01.txt"
+save_name = "text01.png"
+read_path = "D:/" + file_name
 
 data = np.loadtxt(read_path, delimiter=',', dtype='float32', skiprows=1)
-print(data)
 fig, ax = plt.subplots(4, 3, figsize=(14, 10))
 
-ax[0][0].plot(data[:, 0], 'r-')  # 7  8  9     13 14 15   19 20 21
-ax[0][1].plot(data[:, 1], 'r-')  # 7  8  9     13 14 15   19 20 21
-ax[0][2].plot(data[:, 2], 'r-')  # 7  8  9     13 14 15   19 20 21
-ax[0][0].plot(data[:, 3], 'b-')  # 7  8  9     13 14 15   19 20 21
-ax[0][1].plot(data[:, 4], 'b-')  # 7  8  9     13 14 15   19 20 21
-ax[0][2].plot(data[:, 5], 'b-')  # 7  8  9     13 14 15   19 20 21
-ax[1][0].plot(data[:, 6], 'r-')  # 7  8  9     13 14 15   19 20 21
-ax[1][1].plot(data[:, 7], 'r-')  # 7  8  9     13 14 15   19 20 21
-ax[1][2].plot(data[:, 8], 'r-')  # 7  8  9     13 14 15   19 20 21
-# ax[1][0].plot(data[:, 9], 'b-')  # 7  8  9     13 14 15   19 20 21
-# ax[1][1].plot(data[:, 10], 'b-')  # 7  8  9     13 14 15   19 20 21
-# ax[1][2].plot(data[:, 11], 'b-')  # 7  8  9     13 14 15   19 20 21
-ax[2][0].plot(data[:, 12], 'r-')  # 7  8  9     13 14 15   19 20 21
-ax[2][1].plot(data[:, 13], 'r-')  # 7  8  9     13 14 15   19 20 21
-ax[2][2].plot(data[:, 14], 'r-')  # 7  8  9     13 14 15   19 20 21
-ax[3][0].plot(data[:, 18], 'r-')  # 7  8  9     13 14 15   19 20 21
-ax[3][1].plot(data[:, 19], 'r-')  # 7  8  9     13 14 15   19 20 21
-ax[3][2].plot(data[:, 20], 'r-')  # 7  8  9     13 14 15   19 20 21
-# ax[i][j].plot(data[:,0], data[:,i*6+j+4], 'b-') # 10 11 12    16 17 18   22 23 24
+
+ax[0][0].plot(data[:, 0], data[:, 1], 'r-')  # 7  8  9     13 14 15   19 20 21
+ax[0][1].plot(data[:, 0], data[:, 2], 'r-')  # 7  8  9     13 14 15   19 20 21
+ax[0][2].plot(data[:, 0], data[:, 3], 'r-')  # 7  8  9     13 14 15   19 20 21
+ax[0][0].plot(data[:, 0], data[:, 4], 'b-')  # 7  8  9     13 14 15   19 20 21
+ax[0][1].plot(data[:, 0], data[:, 5], 'b-')  # 7  8  9     13 14 15   19 20 21
+ax[0][2].plot(data[:, 0], data[:, 6], 'b-')  # 7  8  9     13 14 15   19 20 21
+ax[1][0].plot(data[:, 0], data[:, 7], 'r-')  # 7  8  9     13 14 15   19 20 21
+ax[1][1].plot(data[:, 0], data[:, 8], 'r-')  # 7  8  9     13 14 15   19 20 21
+ax[1][2].plot(data[:, 0], data[:, 9], 'r-')  # 7  8  9     13 14 15   19 20 21
+ax[1][0].plot(data[:, 0], data[:, 10], 'b-')  # 7  8  9     13 14 15   19 20 21
+ax[1][1].plot(data[:, 0], data[:, 11], 'b-')  # 7  8  9     13 14 15   19 20 21
+ax[1][2].plot(data[:, 0], data[:, 12], 'b-')  # 7  8  9     13 14 15   19 20 21
+ax[2][0].plot(data[:, 0], data[:, 13], 'r-')  # 7  8  9     13 14 15   19 20 21
+ax[2][1].plot(data[:, 0], data[:, 14], 'r-')  # 7  8  9     13 14 15   19 20 21
+ax[2][2].plot(data[:, 0], data[:, 15], 'r-')  # 7  8  9     13 14 15   19 20 21
+ax[2][0].plot(data[:, 0], data[:, 16], 'b-')  # 7  8  9     13 14 15   19 20 21
+ax[2][1].plot(data[:, 0], data[:, 17], 'b-')  # 7  8  9     13 14 15   19 20 21
+ax[2][2].plot(data[:, 0], data[:, 18], 'b-')  # 7  8  9     13 14 15   19 20 21
+ax[3][0].plot(data[:, 0], data[:, 19], 'r-')  # 7  8  9     13 14 15   19 20 21
+ax[3][1].plot(data[:, 0], data[:, 20], 'r-')  # 7  8  9     13 14 15   19 20 21
+ax[3][2].plot(data[:, 0], data[:, 21], 'r-')  # 7  8  9     13 14 15   19 20 21
+ax[3][0].plot(data[:, 0], data[:, 22], 'b-')  # 7  8  9     13 14 15   19 20 21
+ax[3][1].plot(data[:, 0], data[:, 23], 'b-')  # 7  8  9     13 14 15   19 20 21
+ax[3][2].plot(data[:, 0], data[:, 24], 'b-')  # 7  8  9     13 14 15   19 20 21
 
 
 ax[0, 0].set_title("position x")
@@ -43,7 +48,7 @@ ax[3, 0].set_title("body_rate x")
 ax[3, 1].set_title("body_rate y")
 ax[3, 2].set_title("body_rate z")
 
-save_path = "C:/Users/Juliazhou/Desktop/differential-flatness-flight/text.png"
+save_path = "D:/" + save_name
 plt.savefig(save_path, dpi=300)
 plt.show()
 '''
@@ -51,9 +56,9 @@ plt.show()
 # for i in range(3):
 #     ax[0][i].plot(data[:,0], data[:,i+1], 'r*', label="local")
 
-# ax[0][0].plot(data[:,0], 1*np.ones((data.shape[0],1)), 'b-', label = "target")
-# ax[0][1].plot(data[:,0], 1*np.ones((data.shape[0],1)), 'b-', label = "target")
-# ax[0][2].plot(data[:,0], 1.5*np.ones((data.shape[0],1)), 'b-', label = "target")
+ax[0][0].plot(data[:,0], 1*np.ones((data.shape[0],1)), 'b-', label = "target")
+ax[0][1].plot(data[:,0], 1*np.ones((data.shape[0],1)), 'b-', label = "target")
+ax[0][2].plot(data[:,0], 1.5*np.ones((data.shape[0],1)), 'b-', label = "target")
 
 for i in range(2):
     for j in range(3):

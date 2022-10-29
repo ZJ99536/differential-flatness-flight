@@ -46,6 +46,10 @@ class Controller:
         self.flag = 0
 
         self.att_setpoint_pub = rospy.Publisher('mavros/setpoint_raw/attitude', AttitudeTarget, queue_size=1)
+        self.vel_setpoint_pub = rospy.Publisher('mavgnc/velocity_setpoint', TwistStamped, queue_size=1)
+        self.pos_setpoint_pub = rospy.Publisher('mavgnc/position_setpoint', PoseStamped, queue_size=1)
+        self.att_sp_euler_pub = rospy.Publisher('mavgnc/att_sp_euler',Vector3Stamped,queue_size=1)
+        self.att_euler_pub = rospy.Publisher('mavgnc/att_euler',Vector3Stamped,queue_size=1)
         
         # self.odom_sub = rospy.Subscriber('mavros/local_position/odom',Odometry,self.odometry_cb)
 
@@ -181,6 +185,10 @@ class Controller:
         self.att.header.frame_id = "base_footprint"
         self.att.header.stamp = rospy.Time.now()
         self.att_setpoint_pub.publish(self.att)
+        self.vel_setpoint_pub.publish(self.velocity_setpoint)
+        self.pos_setpoint_pub.publish(self.position_setpoint)
+        self.att_euler_pub.publish(self.attitude_euler)
+        self.att_sp_euler_pub.publish(self.att_setpoint_euler)
    
     def is_at_setpoint(self):
         self.position_setpoint.pose.position.x = 0
@@ -503,7 +511,7 @@ class Controller:
 def main():
     print("start!")
 
-    rospy.init_node('offboard_test_node', anonymous=True)
+    rospy.init_node('mavgnc', anonymous=True)
     cnt = Controller()
     rate = rospy.Rate(100)
 
